@@ -1,0 +1,2926 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{{ config('app.name', 'Laravel') }}</title>
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        .glass-nav {
+            background: transparent;
+            border-bottom: none;
+        }
+
+        /* Guest navbar shell: hanya bar putih rounded di atas background halaman */
+        .guest-nav-shell {
+            background: #ffffff;
+            border-radius: 1.25rem;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08); */
+            border: 1px solid rgba(148, 163, 184, 0.67); */
+        }
+
+        .glass-nav.scrolled .guest-nav-shell {
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+        }
+
+        /* Hero slider smooth pop-in/out effect */
+        .hero-slide {
+            transition: transform 700ms ease-out, opacity 700ms ease-out;
+        }
+        .hero-slide-inactive {
+            opacity: 0.45;
+            transform: scale(0.96);
+        }
+        .hero-slide-active {
+            opacity: 1;
+            transform: scale(1.02);
+        }
+        .hero-slide-image {
+            transition: transform 900ms ease-out, opacity 700ms ease-out;
+        }
+        .hero-slide-active .hero-slide-image {
+            transform: scale(1.04);
+        }
+        .hero-slide-inactive .hero-slide-image {
+            transform: scale(1.01);
+        }
+
+        .nav-link {
+            position: relative;
+            color: #2346a3; /* biru utama, turunan dari 8CA9FF */
+            transition: all 0.25s ease;
+            text-shadow: none;
+            border-radius: 9999px;
+        }
+        .nav-link:hover {
+            color: #1d4ed8; /* blue-600 */
+            background-color: rgba(140, 169, 255, 0.16);
+            transform: translateY(0);
+        }
+        .nav-link.active {
+            color: #1d4ed8;
+        }
+        .glass-nav.scrolled .nav-link {
+            color: #0f172a;
+        }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -2px;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #8CA9FF 0%, #B4C5FF 100%);
+            border-radius: 2px;
+        }
+        .nav-link:hover {
+            color: #8CA9FF;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(51, 65, 85, 0.12); /* slate shadow - subtle */
+        }
+
+        .elegant-gradient {
+            background: linear-gradient(135deg, #1a1c2c 0%, #2a3042 100%);
+        }
+
+        .elegant-text-gradient {
+            background: linear-gradient(135deg, #c2c8ff 0%, #ffffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(51, 65, 85, 0.25); /* slate shadow on hover */
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .elegant-border {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .elegant-shadow {
+            box-shadow: 0 8px 32px 0 rgba(51, 65, 85, 0.15); /* slate shadow - subtle & elegant */
+        }
+
+        .section-spacing {
+            padding: 80px 0;
+        }
+        
+        @media (min-width: 1024px) {
+            .section-spacing {
+                padding: 100px 0;
+            }
+        }
+
+        .elegant-button {
+            background: linear-gradient(135deg, #7F9CFF 0%, #8CA9FF 40%, #C3D1FF 100%);
+        }
+
+        .elegant-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        /* View Mode Button Styles */
+        .view-mode-btn.active {
+            background: linear-gradient(135deg, #7F9CFF 0%, #8CA9FF 60%, #C3D1FF 100%);
+            color: white;
+        }
+        
+        .view-mode-btn.active svg {
+            stroke: white;
+        }
+
+        /* Masonry Layout */
+        .masonry-grid {
+            column-count: 4;
+            column-gap: 1rem;
+        }
+
+        .masonry-grid .masonry-item {
+            break-inside: avoid;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 1024px) {
+            .masonry-grid {
+                column-count: 3;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .masonry-grid {
+                column-count: 2;
+            }
+        }
+
+        .elegant-input:focus {
+            border-color: rgba(140, 169, 255, 0.7);
+            box-shadow: 0 0 0 2px rgba(140, 169, 255, 0.35); /* soft blue focus ring */
+        }
+
+        .scroll-indicator {
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-30px); }
+            60% { transform: translateY(-15px); }
+        }
+
+        .bg-pattern {
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slide-up {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-slide-up {
+            animation: slide-up 1s ease-out forwards;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes bounce-slow {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
+            40% { transform: translateY(-20px) translateX(-50%); }
+            60% { transform: translateY(-10px) translateX(-50%); }
+        }
+
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Instagram-Style Scrollbar Hide */
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Instagram-Style Fade In Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .gallery-category-content {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Smooth Category Tab Active State */
+        .gallery-category-tab.active {
+            background: linear-gradient(135deg, #7F9CFF 0%, #8CA9FF 50%, #C3D1FF 100%);
+            color: white;
+            box-shadow: 0 10px 25px rgba(140, 169, 255, 0.35);
+        }
+
+        /* Ken Burns Effect - Zoom and Pan (lebih subtle) */
+        @keyframes ken-burns {
+            0% { 
+                transform: scale(1.05) translate(0, 0);
+            }
+            100% { 
+                transform: scale(1.12) translate(-3%, -2%);
+            }
+        }
+
+        .animate-ken-burns {
+            animation: ken-burns 25s ease-in-out infinite alternate;
+            will-change: transform;
+        }
+
+        .animate-fade-in {
+            animation: fade-in 1.5s ease-out forwards;
+        }
+
+        .animate-slide-up {
+            animation: slide-up 1s ease-out forwards;
+        }
+
+        .animate-gradient {
+            background: linear-gradient(
+                270deg,
+                rgba(0,0,0,0.7) 0%,
+                rgba(0,0,0,0.5) 50%,
+                rgba(0,0,0,0.7) 100%
+            );
+            background-size: 200% 200%;
+            animation: gradient-shift 15s ease infinite;
+        }
+
+        .glass-nav.scrolled {
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Custom Scrollbar for Modal */
+        .overflow-y-auto::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .overflow-y-auto::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        
+        .overflow-y-auto::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #7F9CFF 0%, #8CA9FF 60%, #C3D1FF 100%);
+            border-radius: 10px;
+        }
+        
+        .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #6E8CFF 0%, #7F9CFF 60%, #B4C5FF 100%);
+        }
+
+        /* Gallery header & search accents using 8CA9FF palette */
+        .gallery-title-gradient {
+            background: linear-gradient(135deg, #5F7CFF 0%, #8CA9FF 45%, #C3D1FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 6px rgba(15, 23, 42, 0.22);
+        }
+
+        .gallery-underline {
+            background: linear-gradient(90deg, #8CA9FF 0%, #C3D1FF 100%);
+        }
+
+        .gallery-search-glow {
+            background: linear-gradient(90deg, #8CA9FF 0%, #C3D1FF 100%);
+        }
+
+        /* Footer accents using 8CA9FF palette */
+        .footer-accent {
+            color: #8CA9FF;
+        }
+
+        .footer-link {
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: #8CA9FF;
+        }
+
+        /* AI Assistant Widget */
+        .ai-assistant-wrapper {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            z-index: 60;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 12px;
+        }
+
+        .ai-assistant-toggle {
+            width: 64px;
+            height: 64px;
+            border-radius: 9999px;
+            border: 3px solid rgba(255, 255, 255, 0.7);
+            background: linear-gradient(135deg, #7F9CFF 0%, #8CA9FF 50%, #C3D1FF 100%);
+            box-shadow: 0 20px 35px rgba(124, 143, 255, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .ai-assistant-toggle:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 25px 45px rgba(124, 143, 255, 0.45);
+        }
+
+        .ai-assistant-toggle img {
+            width: 38px;
+            height: 38px;
+        }
+
+        .ai-assistant-badge {
+            position: absolute;
+            top: -6px;
+            right: -4px;
+            background: #f97316;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+        }
+
+        .ai-assistant-panel {
+            width: clamp(280px, 24vw, 360px);
+            max-width: calc(100vw - 32px);
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 35px 45px rgba(15, 23, 42, 0.2);
+            border: 1px solid rgba(124, 143, 255, 0.25);
+            overflow: hidden;
+            transform-origin: bottom right;
+            animation: assistant-pop 0.35s ease forwards;
+            display: flex;
+            flex-direction: column;
+            height: clamp(380px, 45vh, 520px);
+            max-height: calc(80vh - 80px);
+        }
+
+        .ai-assistant-header {
+            background: linear-gradient(135deg, #5F7CFF 0%, #8CA9FF 60%, #C3D1FF 100%);
+            color: #fff;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .ai-assistant-header .info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ai-assistant-header img {
+            width: 38px;
+            height: 38px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .ai-status-box {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .ai-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 3px 10px;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .ai-status-pill span {
+            width: 8px;
+            height: 8px;
+            border-radius: 9999px;
+            background: #4ade80;
+            box-shadow: 0 0 6px rgba(74, 222, 128, 0.7);
+        }
+
+        .ai-assistant-body {
+            padding: 16px;
+            background: linear-gradient(180deg, #f8f9ff 0%, #ffffff 100%);
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .ai-assistant-messages {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding-right: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .assistant-bubble,
+        .user-bubble {
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            max-width: 85%;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+            position: relative;
+        }
+
+        .assistant-bubble {
+            background: #ffffff;
+            border: 1px solid rgba(124, 143, 255, 0.3);
+            color: #1f2937;
+        }
+
+        .user-bubble {
+            background: #7F9CFF;
+            color: white;
+            margin-left: auto;
+        }
+
+        .ai-message-time {
+            display: block;
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .ai-quick-questions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+            max-height: 90px;
+            overflow-y: auto;
+        }
+
+        .ai-quick-question {
+            background: rgba(124, 143, 255, 0.12);
+            border: 1px solid rgba(124, 143, 255, 0.25);
+            color: #1d4ed8;
+            border-radius: 9999px;
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .ai-quick-question:hover {
+            background: rgba(124, 143, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .ai-assistant-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 16px;
+            border-top: 1px solid rgba(226, 232, 240, 0.9);
+            background: #f8fafc;
+        }
+
+        .ai-assistant-input input {
+            flex: 1;
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            border-radius: 9999px;
+            padding: 10px 14px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border 0.2s ease, box-shadow 0.2s ease;
+            background: #ffffff;
+            color: #0f172a;
+        }
+
+        .ai-assistant-input input:focus {
+            border-color: rgba(124, 143, 255, 0.7);
+            box-shadow: 0 0 0 3px rgba(124, 143, 255, 0.15);
+        }
+
+        .ai-send-button {
+            background: linear-gradient(135deg, #5F7CFF 0%, #8CA9FF 60%, #C3D1FF 100%);
+            border: none;
+            color: white;
+            border-radius: 9999px;
+            padding: 10px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            box-shadow: 0 10px 20px rgba(124, 143, 255, 0.35);
+        }
+
+        .ai-send-button svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .ai-send-button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .ai-typing {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .ai-typing span {
+            width: 6px;
+            height: 6px;
+            background: #7F9CFF;
+            border-radius: 9999px;
+            animation: typing 1.2s infinite ease-in-out;
+        }
+
+        .ai-typing span:nth-child(2) { animation-delay: 0.15s; }
+        .ai-typing span:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { opacity: 0.3; transform: translateY(0); }
+            40% { opacity: 1; transform: translateY(-2px); }
+        }
+
+        @keyframes assistant-pop {
+            0% {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .ai-assistant-wrapper {
+                right: 12px;
+                bottom: 12px;
+            }
+
+            .ai-assistant-panel {
+                width: calc(100vw - 24px);
+                height: clamp(340px, 70vh, 520px);
+            }
+        }
+
+        @media (max-height: 640px) {
+            .ai-assistant-panel {
+                height: calc(100vh - 60px);
+            }
+        }
+
+        /* Hide scroll arrow visually but keep script intact */
+        #scrollToTop {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen bg-white">
+    <!-- Navigation -->
+    <nav x-data="{ mobileMenuOpen: false }" class="fixed w-full z-50 glass-nav">
+        <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+            <div class="guest-nav-shell flex items-center justify-between px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 lg:py-3">
+                <!-- Logo dan nama sekolah di pojok kiri (vertikal) -->
+                <div class="flex flex-col items-center space-y-0.5 sm:space-y-1">
+                    <img class="h-10 sm:h-12 lg:h-14 w-auto drop-shadow-lg" src="{{ asset('assets/img/logo.png') }}" alt="Schoolary Logo">
+                    <div class="flex flex-col items-center text-center">
+                        <!-- <span class="text-[10px] sm:text-xs lg:text-sm font-bold text-white drop-shadow-lg leading-tight whitespace-nowrap">School4ry</span> -->
+                        <!-- <span class="text-[8px] sm:text-[10px] lg:text-xs text-white/90 drop-shadow-md">NEBRAZKA</span> -->
+                    </div>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden lg:flex items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <a href="#beranda" class="nav-link px-3 py-2 text-sm font-medium transition-all duration-300 hover:scale-105" id="nav-beranda">
+                            <span class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                                <span>Beranda</span>
+                            </span>
+                        </a>
+                        <!-- <a href="#profil" class="nav-link px-3 py-2 text-sm font-medium transition-all duration-300 hover:scale-105" id="nav-profil">Profil</a> -->
+                        <a href="#galeri" class="nav-link px-3 py-2 text-sm font-medium transition-all duration-300 hover:scale-105" id="nav-galeri">
+                            <span class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <span>Galeri</span>
+                            </span>
+                        </a>
+                        <a href="#berita-agenda" class="nav-link px-3 py-2 text-sm font-medium transition-all duration-300 hover:scale-105" id="nav-berita">
+                            <span class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <span>Berita & Agenda</span>
+                            </span>
+                        </a>
+                        <a href="#kontak" class="nav-link px-3 py-2 text-sm font-medium transition-all duration-300 hover:scale-105" id="nav-kontak">
+                            <span class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                <span>Kontak</span>
+                            </span>
+                        </a>
+                    </div>
+
+                    @if (Route::has('login'))
+                        @auth
+                            <form method="POST" action="{{ route('logout') }}" class="ml-2">
+                                @csrf
+                                <button type="submit" class="px-4 py-2 text-sm font-medium rounded-full shadow-md transition-all duration-300 bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:shadow-lg hover:brightness-110 flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                    </svg>
+                                    <span>Logout</span>
+                                </button>
+                            </form>
+                        @else
+                            <a href="{{ route('login') }}" class="px-4 py-2 text-sm font-medium rounded-full shadow-md transition-all duration-300 bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:shadow-lg hover:brightness-110 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h12m-6 4v1a3 3 0 003 3h2a3 3 0 003-3V7a3 3 0 00-3-3h-2a3 3 0 00-3 3v1" />
+                                </svg>
+                                <span>Login</span>
+                            </a>
+                        @endauth
+                    @endif
+                </div>
+                
+                <!-- Mobile Hamburger Button -->
+                <div class="lg:hidden">
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" 
+                            class="p-2 rounded-lg text-white hover:bg-white/10 transition-all duration-300 active:scale-95">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
+                            <path x-show="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Menu Dropdown -->
+            <div x-show="mobileMenuOpen" 
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 -translate-y-2"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 -translate-y-2"
+                 @click.away="mobileMenuOpen = false"
+                 class="lg:hidden pb-3 pt-2 space-y-1">
+                <a href="#beranda" @click="mobileMenuOpen = false" class="block px-4 py-2.5 text-white text-sm font-medium hover:bg-white/10 rounded-lg transition-all duration-300">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        <span>Beranda</span>
+                    </div>
+                </a>
+                <!-- <a href="#profil" @click="mobileMenuOpen = false" class="block px-4 py-2.5 text-white text-sm font-medium hover:bg-white/10 rounded-lg transition-all duration-300">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        <span>Profil</span>
+                    </div>
+                </a> -->
+                <a href="#galeri" @click="mobileMenuOpen = false" class="block px-4 py-2.5 text-white text-sm font-medium hover:bg-white/10 rounded-lg transition-all duration-300">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span>Galeri</span>
+                    </div>
+                </a>
+                <a href="#berita-agenda" @click="mobileMenuOpen = false" class="block px-4 py-2.5 text-white text-sm font-medium hover:bg-white/10 rounded-lg transition-all duration-300">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                        </svg>
+                        <span>Berita</span>
+                    </div>
+                </a>
+                <a href="#kontak" @click="mobileMenuOpen = false" class="block px-4 py-2.5 text-white text-sm font-medium hover:bg-white/10 rounded-lg transition-all duration-300">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        <span>Kontak</span>
+                    </div>
+                </a>
+                @if (Route::has('login'))
+                    <div class="pt-2 mt-2 border-t border-white/20">
+                        @auth
+                            <form method="POST" action="{{ route('logout') }}" class="mx-2">
+                                @csrf
+                                <button type="submit" class="w-full px-4 py-2.5 bg-gradient-to-r from-slate-600 to-blue-500 text-white text-sm font-medium rounded-lg text-center shadow-lg">
+                                    Logout
+                                </button>
+                            </form>
+                        @else
+                            <a href="{{ route('login') }}" class="block mx-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white text-sm font-medium rounded-lg text-center transition-all duration-300">
+                                Login
+                            </a>
+                        @endauth
+                    </div>
+                @endif
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="beranda" class="min-h-screen flex items-center justify-center relative overflow-hidden" 
+             x-data="{ 
+                 currentSlide: 0, 
+                 slides: ['{{ asset('assets/img/slider/slide-1.jpg') }}', '{{ asset('assets/img/slider/slide-2.jpg') }}'],
+                 direction: 'next',
+                 autoplayInterval: null,
+                 nextSlide() {
+                     this.direction = 'next';
+                     this.currentSlide = (this.currentSlide + 1) % this.slides.length;
+                 },
+                 prevSlide() {
+                     this.direction = 'prev';
+                     this.currentSlide = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
+                 },
+                 goToSlide(index) {
+                     this.direction = index > this.currentSlide ? 'next' : 'prev';
+                     this.currentSlide = index;
+                 }
+             }" 
+             x-init="autoplayInterval = setInterval(() => { nextSlide() }, 4000)">
+        
+        <!-- Background Slider dengan animasi horizontal -->
+        <div class="absolute inset-0 w-full h-full overflow-hidden">
+            <!-- Slide Container dengan transform -->
+            <div class="relative w-full h-full flex transition-transform duration-700 ease-out"
+                 :style="'transform: translateX(-' + (currentSlide * 100) + '%)'">
+                <template x-for="(slide, index) in slides" :key="index">
+                    <div class="min-w-full h-full flex-shrink-0 relative hero-slide"
+                         :class="currentSlide === index ? 'hero-slide-active' : 'hero-slide-inactive'">
+                        <div class="w-full h-full overflow-hidden">
+                            <img :src="slide" 
+                                 :alt="'Slide ' + (index + 1)"
+                                 class="w-full h-full object-cover object-center animate-ken-burns hero-slide-image"
+                                 style="filter: brightness(1.1) contrast(1.05);">
+                        </div>
+                    </div>
+                </template>
+            </div>
+            
+            <!-- Overlay dengan gradient yang lebih terang -->
+            <div class="absolute inset-0 bg-gradient-to-b from-black/35 via-black/15 to-black/45 pointer-events-none"></div>
+            
+            <!-- Previous Button -->
+            <button @click="prevSlide()" 
+                    class="absolute left-3 sm:left-4 md:left-6 top-1/2 -translate-y-1/2 z-20 bg-white/10 hover:bg-white/20 backdrop-blur-sm p-2 sm:p-2.5 md:p-3 rounded-full transition-all duration-300 group hover:scale-105 active:scale-95">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
+            
+            <!-- Next Button -->
+            <button @click="nextSlide()" 
+                    class="absolute right-3 sm:right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 bg-white/10 hover:bg-white/20 backdrop-blur-sm p-2 sm:p-2.5 md:p-3 rounded-full transition-all duration-300 group hover:scale-105 active:scale-95">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                </svg>
+            </button>
+            
+            <!-- Slider Navigation Dots (Modern & Minimal) -->
+            <div class="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex gap-1 sm:gap-1.5">
+                <template x-for="(slide, index) in slides" :key="index">
+                    <button @click="goToSlide(index)"
+                            :class="currentSlide === index ? 'bg-white w-1.5 sm:w-2' : 'bg-white/40 w-1 sm:w-1 hover:bg-white/60'"
+                            class="h-0.5 sm:h-1.5 rounded-full transition-all duration-300">
+                    </button>
+                </template>
+            </div>
+        </div>
+
+        <!-- Content dengan animasi -->
+        <div class="relative z-10 text-center px-4 sm:px-6 max-w-5xl mx-auto">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 sm:mb-8 text-white drop-shadow-lg animate-slide-up opacity-0 leading-tight"
+                style="animation-delay: 300ms;">
+                SMK NEGERI 4 BOGOR
+            </h1>
+            <p class="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-200 mb-8 sm:mb-12 drop-shadow-md animate-slide-up opacity-0 px-4"
+               style="animation-delay: 600ms;">
+                Membentuk Generasi Unggul dan Berakhlak Mulia
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 animate-slide-up opacity-0"
+                 style="animation-delay: 900ms;">
+                <a href="#profil" 
+                   class="elegant-button px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-white text-base sm:text-lg font-medium shadow-lg hover:scale-110 transition-all duration-300 w-full sm:w-auto max-w-[200px]">
+                    Jelajahi
+                </a>
+                <a href="#kontak" 
+                   class="glass-card px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-white text-base sm:text-lg font-medium 
+                          hover:bg-white/20 hover:scale-110 transition-all duration-300 w-full sm:w-auto max-w-[200px]">
+                    Hubungi Kami
+                </a>
+            </div>
+        </div>
+    </section>
+
+            <!-- Program Unggulan -->
+            <div class="mt-16">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-bold gallery-title-gradient mb-4">Kejuruan</h2>
+                    <div class="w-24 h-1 gallery-underline mx-auto rounded-full"></div>
+                    <p class="text-gray-800 mt-4">Program Keahlian yang Siap Mencetak Generasi Unggul dan Profesional</p>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
+                    <!-- PPLG Card -->
+                    <div class="relative glass-card rounded-2xl p-4 hover-lift group overflow-hidden" data-aos="fade-up" data-aos-delay="100">
+                        <!-- Gradient Border Animation -->
+                        <div class="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                        <div class="absolute inset-[2px] bg-white rounded-2xl"></div>
+                        
+                        <div class="relative z-10">
+                        <div class="h-32 mb-4 rounded-xl overflow-hidden bg-white flex items-center justify-center p-2">
+                            <img src="{{ asset('assets/img/logo_pplg.png') }}" alt="PPLG" 
+                                 class="w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-500">
+                        </div>
+                        <div class="text-indigo-500 mb-3 flex justify-center">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-indigo-700 mb-2 text-center">PPLG</h3>
+                        <h4 class="text-xs text-indigo-600 mb-3 text-center leading-tight">Pengembangan Perangkat Lunak dan Gim</h4>
+                        <p class="text-gray-700 text-xs leading-relaxed text-center">
+                            Program keahlian yang fokus pada pengembangan aplikasi, website, dan game dengan teknologi terkini. 
+                            Lulusan siap menjadi developer profesional di industri teknologi.
+                        </p>
+                        </div>
+                    </div>
+
+                    <!-- TJKT Card -->
+                    <div class="relative glass-card rounded-2xl p-4 hover-lift group overflow-hidden" data-aos="fade-up" data-aos-delay="200">
+                        <div class="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                        <div class="absolute inset-[2px] bg-white rounded-2xl"></div>
+                        <div class="relative z-10">
+                        <div class="h-32 mb-4 rounded-xl overflow-hidden bg-white flex items-center justify-center p-2">
+                            <img src="{{ asset('assets/img/logo_tjkt.png') }}" alt="TJKT" 
+                                 class="w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-500">
+                        </div>
+                        <div class="text-purple-500 mb-3 flex justify-center">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-purple-700 mb-2 text-center">TJKT</h3>
+                        <h4 class="text-xs text-purple-600 mb-3 text-center leading-tight">Teknik Jaringan Komputer dan Telekomunikasi</h4>
+                        <p class="text-gray-700 text-xs leading-relaxed text-center">
+                            Membekali siswa dengan keahlian dalam instalasi jaringan, keamanan sistem, dan manajemen infrastruktur IT modern.
+                        </p>
+                        </div>
+                    </div>
+
+                    <!-- TO Card -->
+                    <div class="relative glass-card rounded-2xl p-4 hover-lift group overflow-hidden" data-aos="fade-up" data-aos-delay="300">
+                        <div class="absolute inset-0 bg-gradient-to-r from-pink-500 via-rose-500 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                        <div class="absolute inset-[2px] bg-white rounded-2xl"></div>
+                        <div class="relative z-10">
+                        <div class="h-32 mb-4 rounded-xl overflow-hidden bg-white flex items-center justify-center p-2">
+                            <img src="{{ asset('assets/img/logo_to.png') }}" alt="TO" 
+                                 class="w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-500">
+                        </div>
+                        <div class="text-pink-500 mb-3 flex justify-center">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-pink-700 mb-2 text-center">TO</h3>
+                        <h4 class="text-xs text-pink-600 mb-3 text-center leading-tight">Teknik Otomotif</h4>
+                        <p class="text-gray-700 text-xs leading-relaxed text-center">
+                            Program keahlian yang mempelajari teknologi kendaraan modern, sistem kelistrikan, dan perawatan mesin dengan standar industri.
+                        </p>
+                        </div>
+                    </div>
+
+                    <!-- TFL Card -->
+                    <div class="relative glass-card rounded-2xl p-4 hover-lift group overflow-hidden" data-aos="fade-up" data-aos-delay="400">
+                        <div class="absolute inset-0 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                        <div class="absolute inset-[2px] bg-white rounded-2xl"></div>
+                        <div class="relative z-10">
+                        <div class="h-32 mb-4 rounded-xl overflow-hidden bg-white flex items-center justify-center p-2">
+                            <img src="{{ asset('assets/img/logo_tfl.png') }}" alt="TFL" 
+                                 class="w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-500">
+                        </div>
+                        <div class="text-emerald-500 mb-3 flex justify-center">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-emerald-700 mb-2 text-center">TFL</h3>
+                        <h4 class="text-xs text-emerald-600 mb-3 text-center leading-tight">Teknik Fabrikasi Logam dan Manufaktur</h4>
+                        <p class="text-gray-700 text-xs leading-relaxed text-center">
+                            Mempersiapkan siswa dalam bidang pengolahan logam, pengelasan, dan manufaktur dengan teknologi modern untuk industri.
+                        </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CTA Button -->
+                <div class="text-center mt-12">
+                    <a href="#kontak" class="elegant-button inline-flex items-center px-8 py-3 rounded-full text-white text-lg font-medium shadow-lg group">
+                        <span>Daftar Sekarang</span>
+                        <svg class="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Galeri Section - Instagram Style -->
+    <section id="galeri" class="section-spacing relative overflow-hidden bg-gradient-to-b from-gray-50 to-white">
+        <div class="absolute inset-0 bg-pattern opacity-30"></div>
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Header -->
+            <div class="text-center mb-10">
+                <h2 class="text-3xl md:text-4xl font-bold gallery-title-gradient mb-3">
+                    Galeri Sekolah
+                </h2>
+                <p class="text-gray-600 text-base max-w-2xl mx-auto mb-4">
+                    Jelajahi momen-momen berharga dan kegiatan sekolah kami
+                </p>
+                <div class="w-20 h-1 gallery-underline mx-auto rounded-full"></div>
+            </div>
+
+            <!-- Instagram-Style Search Bar -->
+            <div class="max-w-2xl mx-auto mb-8">
+                <div class="relative group">
+                    <div class="absolute inset-0 gallery-search-glow rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
+                    <div class="relative">
+                        <input type="text" 
+                            id="albumSearch"
+                            placeholder="🔍 Cari album atau kategori..."
+                            class="w-full px-6 py-4 rounded-2xl bg-white border-2 border-gray-200 
+                                text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-500
+                                transition-all duration-300 shadow-lg hover:shadow-xl">
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2">
+                            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instagram-Style Category Pills -->
+            <div class="mb-12 overflow-x-auto pb-4 scrollbar-hide">
+                <div class="flex justify-center gap-3 min-w-max px-4">
+                    <!-- All Albums Tab -->
+                    <button onclick="showGalleryCategory('all-albums')"
+                        class="gallery-category-tab active group relative px-6 py-3 rounded-full text-sm font-semibold
+                            elegant-button text-white shadow-lg
+                            hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden">
+                        <span class="relative z-10 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                            </svg>
+                            Semua Album
+                            <span class="ml-1 px-2.5 py-0.5 text-xs bg-white/25 backdrop-blur-sm rounded-full font-bold">
+                                {{ $allAlbums->count() }}
+                            </span>
+                        </span>
+                        <div class="absolute inset-0 bg-gradient-to-r from-indigo-300 via-blue-400 to-sky-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </button>
+
+                    @foreach($kategoris as $kategori)
+                        <button onclick="showGalleryCategory('gallery-{{ $kategori->kategori_id }}')"
+                            class="gallery-category-tab group relative px-6 py-3 rounded-full text-sm font-semibold
+                                bg-white text-gray-700 border-2 border-gray-200 shadow-md
+                                hover:border-indigo-300 hover:text-indigo-600 hover:shadow-lg hover:scale-105 
+                                transition-all duration-300">
+                            <span class="flex items-center gap-2">
+                                {{ $kategori->kategori_judul }}
+                                <span class="px-2.5 py-0.5 text-xs bg-gradient-to-r from-indigo-400 via-blue-400 to-sky-400 text-white rounded-full font-bold">
+                                    {{ $kategori->albums->count() }}
+                                </span>
+                            </span>
+                        </button>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Gallery Content Container -->
+            <div class="gallery-content">
+                <!-- All Albums Section -->
+                <div id="all-albums" class="gallery-category-content">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        @foreach($allAlbums as $album)
+                            @include('components.album-card', ['album' => $album])
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Category Sections -->
+                @foreach($kategoris as $kategori)
+                    <div id="gallery-{{ $kategori->kategori_id }}" class="gallery-category-content hidden">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            @foreach($kategori->albums as $album)
+                                @include('components.album-card', ['album' => $album])
+                            @endforeach
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <!-- Search Results Section -->
+            <div id="search-results" class="hidden">
+                <div class="mb-6 flex items-center justify-between">
+                    <h3 class="text-xl font-bold text-gray-800">Hasil Pencarian</h3>
+                    <button onclick="document.getElementById('albumSearch').value=''; searchAlbums();" 
+                            class="text-sm text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        Tutup
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Search results will be populated here -->
+                </div>
+            </div>
+
+            <!-- Empty State (when no albums) -->
+            @if($allAlbums->count() === 0)
+                <div class="text-center py-20">
+                    <div class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full mb-6">
+                        <svg class="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Belum Ada Album</h3>
+                    <p class="text-gray-600">Album galeri akan segera ditambahkan</p>
+                </div>
+            @endif
+        </div>
+    </section>
+        <!-- Berita & Agenda Section -->
+    <section id="berita-agenda" class="section-spacing relative overflow-hidden">
+        <div class="absolute inset-0 bg-pattern"></div>
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold gallery-title-gradient mb-3">Berita & Agenda</h2>
+                <div class="w-20 h-1 gallery-underline mx-auto rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Berita Column -->
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-2xl font-semibold gallery-title-gradient">Berita Terbaru</h3>
+                        <a href="#" class="text-indigo-600 hover:text-indigo-400 text-sm font-semibold">Lihat Semua</a>
+                    </div>
+
+                    <!-- News Grid -->
+                    <div class="grid grid-cols-1 gap-5">
+                        @foreach($beritas as $berita)
+                            <div class="glass-card rounded-2xl overflow-hidden hover-lift cursor-pointer group"
+                                 onclick="showBeritaPreview('{{ $berita->berita_id }}')">
+                                <!-- Thumbnail -->
+                                <div class="relative h-44 overflow-hidden">
+                                    @if($berita->thumbnail)
+                                        <img src="{{ asset('storage/berita/' . $berita->thumbnail) }}" 
+                                             alt="{{ $berita->judul }}"
+                                             class="w-full h-full object-cover transform group-hover:scale-110 transition-all duration-500">
+                                    @else
+                                        <div class="w-full h-full bg-gradient-to-br from-slate-500/30 to-blue-500/30 flex items-center justify-center">
+                                            <svg class="w-12 h-12 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-.586-1.414l-4.5-4.5A2 2 0 0012.586 3H9"/>
+                                            </svg>
+                                        </div>
+                                    @endif
+                                    @if($berita->is_featured)
+                                        <div class="absolute top-2 right-2">
+                                            <span class="px-2 py-1 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-semibold rounded-full">
+                                                Featured
+                                            </span>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <!-- Content -->
+                                <div class="p-5">
+                                    <h3 class="text-xl font-bold text-indigo-700 group-hover:text-indigo-500 transition-colors mb-2 line-clamp-2">
+                                        {{ $berita->judul }}
+                                    </h3>
+                                    <div class="flex items-center text-sm text-gray-700 mb-4">
+                                        <span class="flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                            </svg>
+                                            {{ $berita->created_at->format('d M Y') }}
+                                        </span>
+                                    </div>
+                                    <p class="text-gray-800 text-sm line-clamp-3">
+                                        {!! Str::limit(strip_tags($berita->konten), 150) !!}
+                                    </p>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Agenda Column -->
+                <div class="lg:col-span-1">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-2xl font-semibold gallery-title-gradient">Agenda Mendatang</h3>
+                        <a href="#" class="text-indigo-600 hover:text-indigo-400 text-sm font-semibold">Lihat Semua</a>
+                    </div>
+
+                    <div class="space-y-3">
+                        @foreach($agendas as $agenda)
+                            <div class="glass-card rounded-xl p-3 hover:bg-white/5 transition-all duration-300">
+                                <div class="flex items-start space-x-4">
+                                    <!-- Tanggal -->
+                                    <div class="flex-shrink-0 w-14 text-center">
+                                        <div class="bg-indigo-500/20 rounded-lg p-2">
+                                            <span class="block text-xs text-indigo-700 font-semibold">
+                                                {{ $agenda->tanggal_mulai->format('M') }}
+                                            </span>
+                                            <span class="block text-2xl font-bold text-indigo-900">
+                                                {{ $agenda->tanggal_mulai->format('d') }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Konten -->
+                                    <div class="flex-1">
+                                        <h4 class="text-base font-semibold text-indigo-800 mb-1 line-clamp-2">{{ $agenda->judul }}</h4>
+                                        <div class="space-y-2 text-sm text-gray-700">
+                                            <div class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                </svg>
+                                                {{ $agenda->tanggal_mulai->format('H:i') }} - 
+                                                {{ $agenda->tanggal_selesai->format('H:i') }} WIB
+                                            </div>
+                                            <div class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                </svg>
+                                                {{ $agenda->lokasi }}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Status Badge -->
+                                    <div class="flex-shrink-0">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                            {{ $agenda->status === 'upcoming' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' }}">
+                                            {{ ucfirst($agenda->status) }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mitra Industri Section -->
+    <section id="mitra" class="section-spacing relative overflow-hidden">
+        <div class="absolute inset-0 bg-pattern"></div>
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold gallery-title-gradient mb-4">Mitra Industri</h2>
+                <div class="w-24 h-1 gallery-underline mx-auto rounded-full"></div>
+                <p class="text-gray-800 mt-4">Perusahaan yang Menjalin Kerja Sama dengan SMKN 4 Bogor</p>
+            </div>
+
+            <!-- Partner Categories -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+                <!-- IT & Software Partners -->
+                <div class="glass-card rounded-2xl p-8 hover-lift" data-aos="zoom-in" data-aos-delay="100">
+                    <h3 class="text-xl font-bold text-indigo-700 mb-6 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        Mitra PPLG & TJKT
+                    </h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-6">
+                        <div class="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all">
+                            <img src="/assets/img/telkom_indonesia.png" alt="Telkom Indonesia" class="h-12 w-auto mx-auto">
+                            <p class="text-center text-sm text-gray-800 mt-2">Telkom Indonesia</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Automotive Partners -->
+                <div class="glass-card rounded-2xl p-8 hover-lift" data-aos="zoom-in" data-aos-delay="200">
+                    <h3 class="text-xl font-bold text-pink-700 mb-6 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-pink-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+                        </svg>
+                        Mitra Teknik Otomotif
+                    </h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-6">
+                        <div class="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all">
+                            <img src="/assets/img/mitsubishi.png" alt="Mitsubishi" class="h-12 w-auto mx-auto">
+                            <p class="text-center text-sm text-gray-800 mt-2">Mitsubishi</p>
+                        </div>
+                        <div class="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all">
+                            <img src="/assets/img/honda.png" alt="Honda" class="h-12 w-auto mx-auto">
+                            <p class="text-center text-sm text-gray-800 mt-2">Honda</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manufacturing Partners -->
+                <div class="glass-card rounded-2xl p-8 hover-lift" data-aos="zoom-in" data-aos-delay="300">
+                    <h3 class="text-xl font-bold text-emerald-700 mb-6 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                        </svg>
+                        Mitra TFL
+                    </h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-6">
+                        <div class="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all">
+                            <img src="/assets/img/jiaec.png" alt="jiaec" class="h-12 w-auto mx-auto">
+                            <p class="text-center text-sm text-gray-800 mt-2">PT.JIAEC</p>
+                        </div>
+                        <div class="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all">
+                            <img src="/assets/img/komatsu.png" alt="komatsu" class="h-12 w-auto mx-auto">
+                            <p class="text-center text-sm text-gray-800 mt-2">Komatsu</p>
+                        </div>
+                        <div class="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all">
+                            <img src="/path/to/astra.png" alt="Astra" class="h-12 w-auto mx-auto">
+                            <p class="text-center text-sm text-gray-800 mt-2">Astra</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other Partners -->
+                <div class="glass-card rounded-2xl p-8 hover-lift" data-aos="zoom-in" data-aos-delay="400">
+                    <h3 class="text-xl font-bold text-yellow-400 mb-6 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        Mitra Lainnya
+                    </h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-6">
+                        <div class="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all">
+                            <img src="/assets/img/komdigi.png" alt="Komdigi" class="h-12 w-auto mx-auto">
+                            <p class="text-center text-sm text-gray-800 mt-2">Komdigi</p>
+                        </div>
+                        <div class="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all">
+                            <img src="/assets/img/disdik.png" alt="disdik" class="h-12 w-auto mx-auto">
+                            <p class="text-center text-sm text-gray-800 mt-2">Disdik Jabar</p>
+                        </div>
+                        <div class="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all">
+                            <img src="/path/to/pemkot-bogor.png" alt="Pemkot Bogor" class="h-12 w-auto mx-auto">
+                            <p class="text-center text-sm text-gray-800 mt-2">Pemkot Bogor</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    <!-- Kontak Section -->
+    <section id="kontak" class="section-spacing relative overflow-hidden">
+        <div class="absolute inset-0 bg-pattern"></div>
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold gallery-title-gradient mb-3">Hubungi Kami</h2>
+                <div class="w-20 h-1 gallery-underline mx-auto rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Contact Form -->
+                <div class="glass-card rounded-2xl p-8 hover-lift">
+                    <form class="space-y-6">
+                        <div>
+                            <input type="text" placeholder="Nama Lengkap" class="w-full px-4 py-3 bg-transparent border-b border-indigo-300 focus:border-indigo-500 text-gray-800 placeholder-gray-500 transition-colors duration-200 outline-none">
+                        </div>
+                        <div>
+                            <input type="email" placeholder="Email" class="w-full px-4 py-3 bg-transparent border-b border-indigo-300 focus:border-indigo-500 text-gray-800 placeholder-gray-500 transition-colors duration-200 outline-none">
+                        </div>
+                        <div>
+                            <textarea placeholder="Pesan" rows="4" class="w-full px-4 py-3 bg-transparent border-b border-indigo-300 focus:border-indigo-500 text-gray-800 placeholder-gray-500 transition-colors duration-200 outline-none"></textarea>
+                        </div>
+                        <div>
+                            <button type="submit" class="elegant-button w-full py-3 rounded-lg text-white font-medium shadow-md hover:shadow-lg hover:scale-[1.02] transition-transform duration-200">
+                                Kirim Pesan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Contact Info and Map -->
+                <div class="glass-card rounded-2xl p-8 hover-lift">
+                    <!-- <h3 class="text-2xl font-bold text-white mb-6">Informasi Kontak</h3> -->
+                    <div class="space-y-3">
+                        <div class="flex items-center text-gray-700">
+                            <svg class="w-6 h-6 mr-3 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            <span>Alamat Sekolah</span>
+                        </div>
+                        <!-- Google Maps Embed -->
+                        <div class="rounded-lg overflow-hidden">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.049882521668!2d106.82211897505155!3d-6.640728064917778!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69c8b16ee07ef5%3A0x14ab253dd267de49!2sSMK%20Negeri%204%20Bogor%20(Nebrazka)!5e0!3m2!1sid!2sid!4v1731640706433!5m2!1sid!2sid" class="w-full h-64" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <div class="absolute inset-0 bg-pattern opacity-10"></div>
+        
+        <!-- Main Footer Content -->
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+                
+                <!-- Tentang Sekolah -->
+                <div class="space-y-3">
+                    <h3 class="text-lg font-bold text-white mb-3 flex items-center">
+                        <svg class="w-6 h-6 mr-2 footer-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                        Tentang Kami
+                    </h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        {{ config('app.name') }} adalah lembaga pendidikan yang berkomitmen untuk memberikan pendidikan berkualitas dan membentuk generasi yang unggul, berakhlak mulia, dan berwawasan global.
+                    </p>
+                    <div class="flex items-center space-x-2 text-gray-400 text-sm">
+                        <svg class="w-5 h-5 footer-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>Terakreditasi A</span>
+                    </div>
+                </div>
+
+                <!-- Link Cepat -->
+                <div class="space-y-3">
+                    <h3 class="text-lg font-bold text-white mb-3 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                        Link Cepat
+                    </h3>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="#beranda" class="text-gray-400 footer-link transition-colors duration-300 flex items-center group">
+                                <svg class="w-4 h-4 mr-2 footer-accent opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                                Beranda
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#berita" class="text-gray-400 footer-link transition-colors duration-300 flex items-center group">
+                                <svg class="w-4 h-4 mr-2 footer-accent opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                                Berita & Informasi
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#agenda" class="text-gray-400 footer-link transition-colors duration-300 flex items-center group">
+                                <svg class="w-4 h-4 mr-2 footer-accent opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                                Agenda Kegiatan
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#galeri" class="text-gray-400 footer-link transition-colors duration-300 flex items-center group">
+                                <svg class="w-4 h-4 mr-2 footer-accent opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                                Galeri Foto
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('login') }}" class="text-gray-400 footer-link transition-colors duration-300 flex items-center group">
+                                <svg class="w-4 h-4 mr-2 footer-accent opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                                Login Admin
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Kontak -->
+                <div class="space-y-3">
+                    <h3 class="text-lg font-bold text-white mb-3 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        Hubungi Kami
+                    </h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-start text-gray-400 text-sm">
+                            <svg class="w-5 h-5 mr-3 footer-accent flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            <span>Jl. Raya Tajur, Kp. Buntar RT.02/RW.08, Kel. Muara sari, Kec. Bogor Selatan, RT.03/RW.08, Muarasari, Kec. Bogor Sel., Kota Bogor, Jawa Barat 16137</span>
+                        </li>
+                        <li class="flex items-center text-gray-400 text-sm">
+                            <svg class="w-5 h-5 mr-3 footer-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                            </svg>
+                            <span>(0251) 7547381</span>
+                        </li>
+                        <li class="flex items-center text-gray-400 text-sm">
+                            <svg class="w-5 h-5 mr-3 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                            <span>info@smkn4bogor.sch.id</span>
+                        </li>
+                        <li class="flex items-center text-gray-400 text-sm">
+                            <svg class="w-5 h-5 mr-3 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span>Senin - Jumat: 07.00 - 16.00 WIB</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Media Sosial -->
+                <div class="space-y-3">
+                    <h3 class="text-lg font-bold text-white mb-3 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                        </svg>
+                        Media Sosial
+                    </h3>
+                    <p class="text-gray-400 text-sm mb-3">
+                        Ikuti kami di media sosial untuk mendapatkan informasi terbaru
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <!-- Facebook -->
+                        <a href="https://www.facebook.com/smkn4bogor" target="_blank" rel="noopener noreferrer" 
+                           class="group relative w-12 h-12 bg-slate-800 hover:bg-blue-600 rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-blue-500/50">
+                            <svg class="w-6 h-6 text-gray-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                            <span class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Facebook</span>
+                        </a>
+
+                        <!-- Instagram -->
+                        <a href="https://www.instagram.com/smkn4kotabogor/" target="_blank" rel="noopener noreferrer"
+                           class="group relative w-12 h-12 bg-slate-800 hover:bg-gradient-to-br hover:from-purple-600 hover:via-pink-600 hover:to-orange-500 rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-pink-500/50">
+                            <svg class="w-6 h-6 text-gray-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                            <span class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Instagram</span>
+                        </a>
+
+                        <!-- YouTube -->
+                        <a href="https://www.youtube.com/@smknegeri4bogor905" target="_blank" rel="noopener noreferrer"
+                           class="group relative w-12 h-12 bg-slate-800 hover:bg-red-600 rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-red-500/50">
+                            <svg class="w-6 h-6 text-gray-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                            </svg>
+                            <span class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">YouTube</span>
+                        </a>
+
+                        <!-- TikTok -->
+                        <a href="https://www.tiktok.com/@smkn4kotabogor" target="_blank" rel="noopener noreferrer"
+                           class="group relative w-12 h-12 bg-slate-800 hover:bg-black rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-gray-500/50">
+                            <svg class="w-6 h-6 text-gray-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                            </svg>
+                            <span class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">TikTok</span>
+                        </a>
+                    </div>
+
+                    <!-- Newsletter Subscribe (Optional) -->
+                    <!-- <div class="mt-6 pt-6 border-t border-slate-700">
+                        <p class="text-sm text-gray-400 mb-3">Berlangganan Newsletter</p>
+                        <form class="flex gap-2">
+                            <input type="email" placeholder="Email Anda" 
+                                   class="flex-1 px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors">
+                            <button type="submit" 
+                                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </div> -->
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Bottom Footer -->
+        <div class="relative z-10 border-t border-slate-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                    <div class="text-center md:text-left">
+                        <p class="text-gray-400 text-sm">
+                            &copy; {{ date('Y') }} <span class="text-white font-semibold">{{ config('app.name') }}</span>. All rights reserved.
+                        </p>
+                    </div>
+                    <div class="flex items-center space-x-6 text-sm">
+                        <a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">Kebijakan Privasi</a>
+                        <span class="text-gray-600">|</span>
+                        <a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">Syarat & Ketentuan</a>
+                        <span class="text-gray-600">|</span>
+                        <a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">Sitemap</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Decorative Elements -->
+        <div class="absolute top-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl"></div>
+    </footer>
+
+    <!-- Scroll to top button -->
+    <button id="scrollToTop" class="fixed bottom-8 right-8 elegant-button p-3 rounded-full opacity-0 transition-opacity duration-300">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+        </svg>
+    </button>
+
+    <script>
+        // Scroll to top functionality
+        const scrollButton = document.getElementById('scrollToTop');
+        
+        window.addEventListener('scroll', () => {
+            scrollButton.style.opacity = window.scrollY > 500 ? '1' : '0';
+        });
+
+        scrollButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100,
+            easing: 'ease-in-out'
+        });
+    </script>
+    <script>
+
+        // Navbar Animation on Scroll
+        const navbar = document.querySelector('nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth Scroll dengan easing dan aktifkan underline menu
+        function setActiveNav(sectionId) {
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            if (sectionId === 'beranda') document.getElementById('nav-beranda').classList.add('active');
+            if (sectionId === 'profil') document.getElementById('nav-profil').classList.add('active');
+            if (sectionId === 'galeri') document.getElementById('nav-galeri').classList.add('active');
+            if (sectionId === 'berita-agenda') document.getElementById('nav-berita').classList.add('active');
+            if (sectionId === 'kontak') document.getElementById('nav-kontak').classList.add('active');
+        }
+
+        document.querySelectorAll('.nav-link[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                const offset = 80; // Adjust based on navbar height
+                const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - offset;
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+                setActiveNav(this.getAttribute('href').replace('#',''));
+            });
+        });
+
+        // Aktifkan menu sesuai section saat scroll
+        window.addEventListener('scroll', () => {
+            const sections = ['beranda','profil','galeri','berita-agenda','kontak'];
+            let current = 'beranda';
+            for (const id of sections) {
+                const el = document.getElementById(id);
+                if (el && window.scrollY + 100 >= el.offsetTop) {
+                    current = id;
+                }
+            }
+            setActiveNav(current);
+        });
+
+        // Intersection Observer untuk animasi scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+    <script>
+        async function showBeritaPreview(beritaId) {
+            const modal = document.getElementById('beritaPreviewModal');
+            const title = document.getElementById('beritaPreviewTitle');
+            const content = document.getElementById('beritaPreviewContent');
+            
+            try {
+                const response = await fetch(`/preview-berita/${beritaId}`);
+                const data = await response.json();
+                
+                title.textContent = data.judul;
+                
+                let contentHtml = `
+                    <div class="space-y-6">
+                        ${data.thumbnail ? `
+                            <div class="relative h-[300px] rounded-xl overflow-hidden">
+                                <img src="/storage/berita/${data.thumbnail}" 
+                                     alt="${data.judul}"
+                                     class="w-full h-full object-cover">
+                            </div>
+                        ` : ''}
+                        
+                        <div class="flex items-center space-x-4 text-gray-400 text-sm">
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                ${new Date(data.created_at).toLocaleDateString('id-ID', { 
+                                    day: 'numeric', 
+                                    month: 'long', 
+                                    year: 'numeric'
+                                })}
+                            </span>
+                            ${data.user ? `
+                                <span class="flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                                ${data.user.name}
+                            </span>
+                        ` : ''}
+                        </div>
+                        
+                        <div class="prose prose-invert max-w-none">
+                            ${data.konten}
+                        </div>
+                    </div>
+                `;
+                
+                content.innerHTML = contentHtml;
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                
+            } catch (error) {
+                console.error('Error fetching berita:', error);
+            }
+        }
+
+        function closeBeritaPreview() {
+            const modal = document.getElementById('beritaPreviewModal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeBeritaPreview();
+            }
+        });
+    </script>
+
+    <!-- Album View Modal -->
+    <div id="albumViewModal" class="fixed inset-0 z-[60] hidden overflow-y-auto">
+        <div class="min-h-screen px-4 text-center">
+            <div class="fixed inset-0 bg-white/80 transition-opacity"></div>
+            <!-- Modal Content -->
+            <div class="inline-block w-full max-w-6xl mt-24 mb-8 text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl border border-gray-200 relative z-[70] max-h-[85vh] flex flex-col">
+                <div class="relative p-6 flex-shrink-0">
+                    <!-- Tombol Tutup -->
+                    <button onclick="closeAlbumView()" class="absolute top-4 right-4 z-[80] text-gray-500 hover:text-gray-700 bg-white rounded-full p-2 shadow-lg hover:shadow-xl transition-all">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                    <!-- Judul Album & Breadcrumb -->
+                    <h2 id="albumViewTitle" class="text-2xl font-bold text-gray-800 mb-2"></h2>
+                    <p id="albumBreadcrumb" class="text-gray-500 mb-4"></p>
+                    
+                    <!-- Toolbar: Sort, Filter, View Mode -->
+                    <div id="photoToolbar" class="hidden mb-4 p-4 bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl border border-slate-200">
+                        <div class="flex flex-wrap items-center justify-between gap-4">
+                            <!-- Left Side: Sort & Filter -->
+                            <div class="flex flex-wrap items-center gap-3">
+                                <!-- Sort By -->
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/>
+                                    </svg>
+                                    <select id="sortBy" onchange="applySortAndFilter()" 
+                                            class="px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
+                                        <option value="newest">📅 Terbaru</option>
+                                        <option value="oldest">📅 Terlama</option>
+                                        <option value="most_liked">❤️ Paling Disukai</option>
+                                        <option value="most_viewed">👁️ Paling Dilihat</option>
+                                    </select>
+                                </div>
+
+                                <!-- Filter By Date -->
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                                    </svg>
+                                    <select id="filterBy" onchange="applySortAndFilter()" 
+                                            class="px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
+                                        <option value="all">🕐 Semua Waktu</option>
+                                        <option value="today">📆 Hari Ini</option>
+                                        <option value="week">📅 Minggu Ini</option>
+                                        <option value="month">📅 Bulan Ini</option>
+                                        <option value="year">📅 Tahun Ini</option>
+                                    </select>
+                                </div>
+
+                                <!-- Photo Count -->
+                                <div class="px-3 py-2 bg-blue-100 text-blue-700 text-sm font-semibold rounded-lg">
+                                    <span id="photoCount">0</span> Foto
+                                </div>
+                            </div>
+
+                            <!-- Right Side: View Mode -->
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm text-slate-600 font-medium">Tampilan:</span>
+                                <div class="flex bg-white border border-slate-300 rounded-lg overflow-hidden">
+                                    <button onclick="changeViewMode('grid')" id="viewModeGrid" 
+                                            class="view-mode-btn active px-3 py-2 text-slate-700 hover:bg-slate-100 transition-colors border-r border-slate-300"
+                                            title="Grid View">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                                        </svg>
+                                    </button>
+                                    <button onclick="changeViewMode('masonry')" id="viewModeMasonry" 
+                                            class="view-mode-btn px-3 py-2 text-slate-700 hover:bg-slate-100 transition-colors border-r border-slate-300"
+                                            title="Masonry View">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 12a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1v-7z"/>
+                                        </svg>
+                                    </button>
+                                    <button onclick="changeViewMode('list')" id="viewModeList" 
+                                            class="view-mode-btn px-3 py-2 text-slate-700 hover:bg-slate-100 transition-colors"
+                                            title="List View">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Konten Album - Scrollable Area -->
+                <div class="flex-1 overflow-y-auto px-6 pb-6">
+                    <div id="albumViewContent" class="space-y-8 flex flex-col items-center">
+                        <!-- Konten akan diisi oleh JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Photo View Modal -->
+    <div id="photoViewModal" class="fixed inset-0 z-[60] hidden overflow-y-auto">
+        <div class="min-h-screen flex items-center justify-center px-4 py-8">
+            <div class="fixed inset-0 bg-black/80 transition-opacity"></div>
+            <div class="relative max-w-6xl w-full z-[70]">
+                <!-- Tombol Tutup -->
+                <button onclick="closePhotoView()" class="absolute -top-12 right-0 z-[80] text-white hover:text-gray-300 bg-black/50 rounded-full p-2 shadow-lg hover:shadow-xl transition-all">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+                <!-- Konten Foto -->
+                <div id="photoViewContent" class="text-gray-800 bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+                    <!-- Konten akan diisi oleh JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fungsi untuk menampilkan album berdasarkan kategori dengan animasi smooth
+        function showGalleryCategory(categoryId) {
+            // Sembunyikan semua konten kategori
+            const allContents = document.querySelectorAll('.gallery-category-content');
+            allContents.forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // Tampilkan konten kategori yang dipilih dengan animasi
+            const selectedContent = document.getElementById(categoryId);
+            if (selectedContent) {
+                selectedContent.classList.remove('hidden');
+                // Trigger reflow untuk animasi
+                selectedContent.style.animation = 'none';
+                setTimeout(() => {
+                    selectedContent.style.animation = '';
+                }, 10);
+            }
+
+            // Update active state pada category tabs
+            const allTabs = document.querySelectorAll('.gallery-category-tab');
+            allTabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Aktifkan tab yang dipilih
+            const activeTab = document.querySelector(`[onclick="showGalleryCategory('${categoryId}')"]`);
+            if (activeTab) {
+                activeTab.classList.add('active');
+                
+                // Smooth scroll ke tab yang aktif (untuk mobile)
+                activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+
+            // Reset search jika ada
+            const searchInput = document.getElementById('albumSearch');
+            if (searchInput && searchInput.value) {
+                searchInput.value = '';
+                const searchResults = document.getElementById('search-results');
+                const galleryContent = document.querySelector('.gallery-content');
+                if (searchResults) searchResults.classList.add('hidden');
+                if (galleryContent) galleryContent.classList.remove('hidden');
+            }
+        }
+
+        // Tampilkan semua album saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            showGalleryCategory('all-albums');
+        });
+    </script>
+
+    <script>
+        // Fungsi pencarian album
+        function searchAlbums() {
+            const searchInput = document.getElementById('albumSearch');
+            const searchQuery = searchInput.value.toLowerCase().trim();
+            const searchResults = document.getElementById('search-results');
+            const galleryContent = document.querySelector('.gallery-content');
+            
+            // Jika search query kosong, tampilkan kembali gallery content
+            if (searchQuery === '') {
+                searchResults.classList.add('hidden');
+                galleryContent.classList.remove('hidden');
+                return;
+            }
+
+            // Sembunyikan gallery content dan tampilkan search results
+            galleryContent.classList.add('hidden');
+            searchResults.classList.remove('hidden');
+
+            // Clear previous search results
+            const searchResultsGrid = searchResults.querySelector('.grid');
+            searchResultsGrid.innerHTML = '';
+
+            // Get all album cards ONLY from "all-albums" section to avoid duplicates
+            const allAlbumCards = document.querySelectorAll('#all-albums > .grid > div');
+            
+            // Filter dan tampilkan hasil pencarian
+            let found = false;
+            const addedAlbums = new Set(); // Track added albums to prevent duplicates
+            
+            allAlbumCards.forEach(card => {
+                // Get album ID from onclick attribute to check for duplicates
+                const onclickAttr = card.getAttribute('onclick');
+                const albumId = onclickAttr ? onclickAttr.match(/viewAlbum\('(\d+)'\)/)?.[1] : null;
+                
+                // Skip if already added
+                if (albumId && addedAlbums.has(albumId)) {
+                    return;
+                }
+                
+                // Get album name from h3 tag
+                const albumNameElement = card.querySelector('h3');
+                const albumName = albumNameElement ? albumNameElement.textContent.toLowerCase() : '';
+                
+                // Get category from span with rounded-full class
+                const categoryElement = card.querySelector('.rounded-full');
+                const albumCategory = categoryElement ? categoryElement.textContent.toLowerCase() : '';
+                
+                // Get description from p tag
+                const descriptionElement = card.querySelector('p.text-gray-300');
+                const albumDescription = descriptionElement ? descriptionElement.textContent.toLowerCase() : '';
+
+                // Check if search query matches
+                if (albumName.includes(searchQuery) || 
+                    albumCategory.includes(searchQuery) || 
+                    albumDescription.includes(searchQuery)) {
+                    
+                    // Clone the card and append to search results
+                    const clonedCard = card.cloneNode(true);
+                    searchResultsGrid.appendChild(clonedCard);
+                    
+                    // Mark this album as added
+                    if (albumId) {
+                        addedAlbums.add(albumId);
+                    }
+                    
+                    found = true;
+                }
+            });
+
+            // Tampilkan pesan jika tidak ada hasil
+            if (!found) {
+                searchResultsGrid.innerHTML = `
+                    <div class="col-span-full text-center py-8">
+                        <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <h3 class="text-xl font-semibold text-white mb-2">Tidak ada hasil</h3>
+                        <p class="text-gray-400">Tidak ditemukan album yang sesuai dengan pencarian "<span class="font-semibold">${searchQuery}</span>"</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Event listener untuk input pencarian (pastikan DOM sudah loaded)
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('albumSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', debounce(searchAlbums, 300));
+                console.log('Album search initialized');
+            } else {
+                console.error('Album search input not found');
+            }
+        });
+
+        // Fungsi debounce untuk mengurangi frekuensi pencarian
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Reset pencarian saat kategori diganti
+        function showGalleryCategory(categoryId) {
+            // Reset search input
+            document.getElementById('albumSearch').value = '';
+            
+            // Hide search results
+            document.getElementById('search-results').classList.add('hidden');
+            document.querySelector('.gallery-content').classList.remove('hidden');
+
+            // Original category switching logic
+            const allContents = document.querySelectorAll('.gallery-category-content');
+            allContents.forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            const selectedContent = document.getElementById(categoryId);
+            if (selectedContent) {
+                selectedContent.classList.remove('hidden');
+            }
+
+            // Update active tab styles
+            const allTabs = document.querySelectorAll('.gallery-category-tab');
+            allTabs.forEach(tab => {
+                tab.classList.remove('from-indigo-500', 'to-purple-500');
+                tab.classList.add('from-indigo-500/50', 'to-purple-500/50');
+            });
+
+            const activeTab = document.querySelector(`[onclick="showGalleryCategory('${categoryId}')"]`);
+            if (activeTab) {
+                activeTab.classList.remove('from-indigo-500/50', 'to-purple-500/50');
+                activeTab.classList.add('from-indigo-500', 'to-purple-500');
+            }
+        }
+    </script>
+
+    <script>
+        async function viewAlbum(albumId) {
+            window.location.href = `/album/${albumId}`;
+            return;
+            const modal = document.getElementById('albumViewModal');
+            const content = document.getElementById('albumViewContent');
+            const title = document.getElementById('albumViewTitle');
+            const breadcrumb = document.getElementById('albumBreadcrumb');
+            
+            try {
+                // Ganti URL dari /api/albums ke /view-album
+                const response = await fetch(`/view-album/${albumId}`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                
+                const result = await response.json();
+                if (result.status === 'error') {
+                    throw new Error(result.message);
+                }
+                
+                const data = result.data;
+                
+                // Tampilkan modal dan isi kontennya
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                
+                // Isi judul dan breadcrumb
+                title.textContent = data.album_name;
+                breadcrumb.innerHTML = `
+                    <div class="flex items-center text-sm text-gray-400">
+                        <span class="text-indigo-400">${data.kategori.kategori_judul}</span>
+                        ${data.parent ? `
+                            <span class="mx-2">/</span>
+                            <span class="text-gray-400 cursor-pointer hover:text-white" 
+                                  onclick="viewAlbum('${data.parent.album_id}')">
+                                ${data.parent.album_name}
+                            </span>
+                        ` : ''}
+                        <span class="mx-2">/</span>
+                        <span class="text-white">${data.album_name}</span>
+                    </div>
+                `;
+
+                // Isi konten album
+                let contentHtml = '';
+                
+                // Tampilkan deskripsi jika ada
+                if (data.description) {
+                    contentHtml += `
+                        <div class="bg-white/5 rounded-xl p-4 backdrop-blur-sm mb-6">
+                            <p class="text-gray-300">${data.description}</p>
+                        </div>
+                    `;
+                }
+
+                // Tampilkan sub-album jika ada
+                if (data.sub_albums && data.sub_albums.length > 0) {
+                    contentHtml += `
+                        <div class="mb-8">
+                            <h3 class="text-xl font-semibold text-white flex items-center mb-4">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                                </svg>
+                                Sub Album (${data.sub_albums.length})
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-4xl mx-auto">
+                                ${data.sub_albums.map(subAlbum => `
+                                    <div class="group relative bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden hover:bg-white/10 transition-all duration-300 cursor-pointer"
+                                         onclick="viewAlbum('${subAlbum.album_id}')">
+                                        <!-- Sub album content -->
+                                        <div class="relative aspect-video">
+                                            ${subAlbum.cover_image ? 
+                                                `<img src="/storage/${subAlbum.cover_image}" 
+                                                      alt="${subAlbum.album_name}"
+                                                      class="w-full h-full object-cover transform group-hover:scale-110 transition-all duration-500">` :
+                                                `<div class="w-full h-full bg-gradient-to-br from-indigo-500/30 to-purple-500/30 flex items-center justify-center">
+                                                    <svg class="w-12 h-12 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                    </svg>
+                                                </div>`
+                                            }
+                                        </div>
+                                        <div class="p-4">
+                                            <h4 class="text-lg font-semibold text-white group-hover:text-indigo-300 transition-colors">
+                                                ${subAlbum.album_name}
+                                            </h4>
+                                            ${subAlbum.description ? 
+                                                `<p class="mt-1 text-sm text-gray-400 line-clamp-2">${subAlbum.description}</p>` : 
+                                                ''}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Tampilkan foto-foto jika ada
+                if (data.photos && data.photos.length > 0) {
+                    contentHtml += `
+                        <div class="space-y-4">
+                            <h3 class="text-xl font-semibold text-white flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                Foto (${data.photos.length})
+                            </h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-5xl mx-auto">
+                                ${data.photos.map(photo => `
+                                    <div class="group bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden">
+                                        <!-- Image Container -->
+                                        <div class="relative aspect-square overflow-hidden cursor-pointer"
+                                             onclick="openPhotoModal(${photo.id}, '${photo.image_path}', '${photo.title}', '${photo.description || ''}', ${photo.likes_count}, ${photo.is_liked})">
+                                            <img src="/storage/${photo.image_path}" 
+                                                 alt="${photo.title}"
+                                                 class="w-full h-full object-cover">
+                                            
+                                            <!-- Hover Overlay -->
+                                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                                <div class="text-center text-white">
+                                                    <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                    </svg>
+                                                    <p class="text-sm font-medium">Lihat Detail</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Info Section (Instagram Style) -->
+                                        <div class="p-3">
+                                            <!-- Like & Actions -->
+                                            <div class="flex items-center justify-between mb-2">
+                                                <button onclick="event.stopPropagation(); toggleLike(${photo.id})" 
+                                                        id="like-btn-${photo.id}"
+                                                        class="flex items-center space-x-1 transition-all duration-300 hover:scale-110">
+                                                    <svg id="like-icon-${photo.id}" class="w-6 h-6 transition-all ${photo.is_liked ? 'fill-red-500 text-red-500 scale-110' : 'text-gray-700'}" 
+                                                         fill="${photo.is_liked ? 'currentColor' : 'none'}" 
+                                                         stroke="currentColor" 
+                                                         stroke-width="2"
+                                                         viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" 
+                                                              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                                    </svg>
+                                                </button>
+                                                <div class="flex items-center space-x-3 text-gray-500 text-sm">
+                                                    <span class="flex items-center">
+                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                        </svg>
+                                                        ${photo.views_count || 0}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Likes Count -->
+                                            <div class="mb-2">
+                                                <span id="like-count-${photo.id}" class="text-sm font-semibold text-gray-900">${photo.likes_count} suka</span>
+                                            </div>
+                                            
+                                            <!-- Title & Description -->
+                                            <div>
+                                                <h4 class="text-sm font-semibold text-gray-900 mb-1">${photo.title}</h4>
+                                                ${photo.description ? 
+                                                    `<p class="text-xs text-gray-600 line-clamp-2">${photo.description}</p>` 
+                                                    : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Tampilkan pesan jika album kosong
+                if ((!data.photos || data.photos.length === 0) && (!data.sub_albums || data.sub_albums.length === 0)) {
+                    contentHtml += `
+                        <div class="text-center py-8">
+                            <svg class="w-16 h-16 mx-auto text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <p class="text-gray-400">Album ini masih kosong</p>
+                        </div>
+                    `;
+                }
+
+                content.innerHTML = contentHtml;
+                
+                // Store original photos data for sorting/filtering
+                if (data.photos && data.photos.length > 0) {
+                    window.currentPhotos = data.photos;
+                    window.currentViewMode = 'grid';
+                    
+                    // Show toolbar
+                    document.getElementById('photoToolbar').classList.remove('hidden');
+                    document.getElementById('photoCount').textContent = data.photos.length;
+                    
+                    // Reset toolbar
+                    document.getElementById('sortBy').value = 'newest';
+                    document.getElementById('filterBy').value = 'all';
+                } else {
+                    window.currentPhotos = [];
+                    document.getElementById('photoToolbar').classList.add('hidden');
+                }
+                
+            } catch (error) {
+                console.error('Error loading album:', error);
+                alert('Gagal memuat album. Silakan coba lagi nanti.');
+            }
+        }
+
+        // Global variables for sorting and filtering
+        let currentPhotos = [];
+        let currentViewMode = 'grid';
+
+        // Function to apply sort and filter
+        function applySortAndFilter() {
+            if (!currentPhotos || currentPhotos.length === 0) return;
+            
+            const sortBy = document.getElementById('sortBy').value;
+            const filterBy = document.getElementById('filterBy').value;
+            
+            // Clone photos array
+            let filteredPhotos = [...currentPhotos];
+            
+            // Apply date filter
+            const now = new Date();
+            if (filterBy !== 'all') {
+                filteredPhotos = filteredPhotos.filter(photo => {
+                    const photoDate = new Date(photo.created_at);
+                    
+                    switch(filterBy) {
+                        case 'today':
+                            return photoDate.toDateString() === now.toDateString();
+                        case 'week':
+                            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                            return photoDate >= weekAgo;
+                        case 'month':
+                            return photoDate.getMonth() === now.getMonth() && 
+                                   photoDate.getFullYear() === now.getFullYear();
+                        case 'year':
+                            return photoDate.getFullYear() === now.getFullYear();
+                        default:
+                            return true;
+                    }
+                });
+            }
+            
+            // Apply sorting
+            filteredPhotos.sort((a, b) => {
+                switch(sortBy) {
+                    case 'newest':
+                        return new Date(b.created_at) - new Date(a.created_at);
+                    case 'oldest':
+                        return new Date(a.created_at) - new Date(b.created_at);
+                    case 'most_liked':
+                        return b.likes_count - a.likes_count;
+                    case 'most_viewed':
+                        return b.views_count - a.views_count;
+                    default:
+                        return 0;
+                }
+            });
+            
+            // Update photo count
+            document.getElementById('photoCount').textContent = filteredPhotos.length;
+            
+            // Render photos based on current view mode
+            renderPhotos(filteredPhotos, currentViewMode);
+        }
+
+        // Function to change view mode
+        function changeViewMode(mode) {
+            currentViewMode = mode;
+            
+            // Update button states
+            document.querySelectorAll('.view-mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`viewMode${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.add('active');
+            
+            // Re-render photos
+            applySortAndFilter();
+        }
+
+        // Function to render photos based on view mode
+        function renderPhotos(photos, viewMode) {
+            const container = document.querySelector('#albumViewContent .space-y-4');
+            if (!container) return;
+            
+            let photosHtml = '';
+            
+            if (viewMode === 'grid') {
+                // Grid View (4 columns)
+                photosHtml = `
+                    <h3 class="text-xl font-semibold text-white flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Foto (${photos.length})
+                    </h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        ${photos.map(photo => createPhotoCard(photo)).join('')}
+                    </div>
+                `;
+            } else if (viewMode === 'masonry') {
+                // Masonry View (Pinterest style)
+                photosHtml = `
+                    <h3 class="text-xl font-semibold text-white flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Foto (${photos.length})
+                    </h3>
+                    <div class="masonry-grid">
+                        ${photos.map(photo => createMasonryCard(photo)).join('')}
+                    </div>
+                `;
+            } else if (viewMode === 'list') {
+                // List View (with details)
+                photosHtml = `
+                    <h3 class="text-xl font-semibold text-white flex items-center mb-4">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Foto (${photos.length})
+                    </h3>
+                    <div class="space-y-3">
+                        ${photos.map(photo => createListCard(photo)).join('')}
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = photosHtml;
+        }
+
+        // Create photo card for grid view
+        function createPhotoCard(photo) {
+            return `
+                <div class="group relative aspect-square rounded-xl overflow-hidden">
+                    <img src="/storage/${photo.image_path}" 
+                         alt="${photo.title}"
+                         class="w-full h-full object-cover transform group-hover:scale-110 transition-all duration-500 cursor-pointer"
+                         onclick="openPhotoModal(${photo.id}, '${photo.image_path}', '${photo.title}', '${photo.description || ''}', ${photo.likes_count}, ${photo.is_liked}); incrementPhotoView(${photo.id})">
+                    
+                    <!-- Like Button -->
+                    <button onclick="event.stopPropagation(); toggleLike(${photo.id})" 
+                            id="like-btn-${photo.id}"
+                            class="absolute top-3 right-3 z-10 flex items-center space-x-1 px-3 py-1.5 rounded-full backdrop-blur-md transition-all duration-300 ${photo.is_liked ? 'bg-red-500/90 text-white' : 'bg-black/40 text-white hover:bg-black/60'}">
+                        <svg id="like-icon-${photo.id}" class="w-5 h-5 transition-transform ${photo.is_liked ? 'fill-current' : ''}" 
+                             fill="${photo.is_liked ? 'currentColor' : 'none'}" 
+                             stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                        <span id="like-count-${photo.id}" class="text-sm font-semibold">${photo.likes_count}</span>
+                    </button>
+
+                    <!-- Views Counter -->
+                    <div class="absolute top-3 left-3 z-10 flex items-center space-x-1 px-2 py-1 rounded-full bg-black/40 backdrop-blur-md text-white text-xs">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                        <span>${photo.views_count}</span>
+                    </div>
+
+                    <!-- Info Overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                         onclick="openPhotoModal(${photo.id}, '${photo.image_path}', '${photo.title}', '${photo.description || ''}', ${photo.likes_count}, ${photo.is_liked}); incrementPhotoView(${photo.id})">
+                        <div class="absolute bottom-4 left-4 right-4">
+                            <h4 class="text-white font-medium truncate">${photo.title}</h4>
+                            ${photo.description ? 
+                                `<p class="text-sm text-gray-300 line-clamp-2 mt-1">${photo.description}</p>` 
+                                : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Create masonry card
+        function createMasonryCard(photo) {
+            return `
+                <div class="masonry-item group relative rounded-xl overflow-hidden cursor-pointer"
+                     onclick="openPhotoModal(${photo.id}, '${photo.image_path}', '${photo.title}', '${photo.description || ''}', ${photo.likes_count}, ${photo.is_liked}); incrementPhotoView(${photo.id})">
+                    <img src="/storage/${photo.image_path}" 
+                         alt="${photo.title}"
+                         class="w-full h-auto rounded-xl transform group-hover:scale-105 transition-all duration-500">
+                    
+                    <!-- Like & Views Overlay -->
+                    <div class="absolute top-3 right-3 flex flex-col gap-2">
+                        <button onclick="event.stopPropagation(); toggleLike(${photo.id})" 
+                                id="like-btn-${photo.id}"
+                                class="flex items-center space-x-1 px-2 py-1 rounded-full backdrop-blur-md transition-all ${photo.is_liked ? 'bg-red-500/90' : 'bg-black/40 hover:bg-black/60'} text-white text-xs">
+                            <svg id="like-icon-${photo.id}" class="w-4 h-4 ${photo.is_liked ? 'fill-current' : ''}" 
+                                 fill="${photo.is_liked ? 'currentColor' : 'none'}" 
+                                 stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                            <span id="like-count-${photo.id}">${photo.likes_count}</span>
+                        </button>
+                        <div class="flex items-center space-x-1 px-2 py-1 rounded-full bg-black/40 backdrop-blur-md text-white text-xs">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            <span>${photo.views_count}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Title Overlay -->
+                    <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
+                        <h4 class="text-white font-medium text-sm">${photo.title}</h4>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Create list card
+        function createListCard(photo) {
+            const date = new Date(photo.created_at).toLocaleDateString('id-ID', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            return `
+                <div class="flex gap-4 p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
+                     onclick="openPhotoModal(${photo.id}, '${photo.image_path}', '${photo.title}', '${photo.description || ''}', ${photo.likes_count}, ${photo.is_liked}); incrementPhotoView(${photo.id})">
+                    <!-- Thumbnail -->
+                    <div class="flex-shrink-0 w-32 h-32 rounded-lg overflow-hidden">
+                        <img src="/storage/${photo.image_path}" 
+                             alt="${photo.title}"
+                             class="w-full h-full object-cover">
+                    </div>
+                    
+                    <!-- Info -->
+                    <div class="flex-1 min-w-0">
+                        <h4 class="text-lg font-semibold text-slate-800 mb-1">${photo.title}</h4>
+                        ${photo.description ? 
+                            `<p class="text-sm text-slate-600 line-clamp-2 mb-2">${photo.description}</p>` 
+                            : ''}
+                        <div class="flex items-center gap-4 text-sm text-slate-500">
+                            <span class="flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                ${date}
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <svg class="w-4 h-4 ${photo.is_liked ? 'fill-red-500 text-red-500' : ''}" fill="${photo.is_liked ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                </svg>
+                                ${photo.likes_count} Likes
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                                ${photo.views_count} Views
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Like Button -->
+                    <div class="flex-shrink-0">
+                        <button onclick="event.stopPropagation(); toggleLike(${photo.id})" 
+                                id="like-btn-${photo.id}"
+                                class="p-3 rounded-full transition-all ${photo.is_liked ? 'bg-red-500 text-white' : 'bg-slate-200 text-slate-600 hover:bg-slate-300'}">
+                            <svg id="like-icon-${photo.id}" class="w-6 h-6 ${photo.is_liked ? 'fill-current' : ''}" 
+                                 fill="${photo.is_liked ? 'currentColor' : 'none'}" 
+                                 stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Function to increment photo view
+        async function incrementPhotoView(photoId) {
+            try {
+                await fetch(`/photo/${photoId}/view`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    }
+                });
+            } catch (error) {
+                console.error('Error incrementing view:', error);
+            }
+        }
+
+        // Fungsi untuk toggle like
+        async function toggleLike(photoId) {
+            const likeBtn = document.getElementById(`like-btn-${photoId}`);
+            const likeIcon = document.getElementById(`like-icon-${photoId}`);
+            const likeCount = document.getElementById(`like-count-${photoId}`);
+            
+            // Disable button sementara
+            likeBtn.disabled = true;
+            
+            try {
+                const response = await fetch(`/photo/${photoId}/like`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update UI
+                    likeCount.textContent = data.likes_count;
+                    
+                    if (data.liked) {
+                        // Liked - ubah ke merah
+                        likeBtn.classList.remove('bg-black/40', 'hover:bg-black/60');
+                        likeBtn.classList.add('bg-red-500/90');
+                        likeIcon.setAttribute('fill', 'currentColor');
+                        likeIcon.classList.add('fill-current');
+                        
+                        // Animasi bounce
+                        likeIcon.classList.add('animate-bounce');
+                        setTimeout(() => likeIcon.classList.remove('animate-bounce'), 500);
+                    } else {
+                        // Unliked - ubah ke hitam transparan
+                        likeBtn.classList.remove('bg-red-500/90');
+                        likeBtn.classList.add('bg-black/40', 'hover:bg-black/60');
+                        likeIcon.setAttribute('fill', 'none');
+                        likeIcon.classList.remove('fill-current');
+                    }
+                    
+                    // Update modal jika ada
+                    const modalLikeBtn = document.getElementById(`modal-like-btn-${photoId}`);
+                    if (modalLikeBtn) {
+                        const modalLikeIcon = document.getElementById(`modal-like-icon-${photoId}`);
+                        const modalLikeCount = document.getElementById(`modal-like-count-${photoId}`);
+                        
+                        modalLikeCount.textContent = data.likes_count;
+                        
+                        if (data.liked) {
+                            modalLikeBtn.classList.remove('bg-black/40', 'hover:bg-black/60');
+                            modalLikeBtn.classList.add('bg-red-500');
+                            modalLikeIcon.setAttribute('fill', 'currentColor');
+                        } else {
+                            modalLikeBtn.classList.remove('bg-red-500');
+                            modalLikeBtn.classList.add('bg-black/40', 'hover:bg-black/60');
+                            modalLikeIcon.setAttribute('fill', 'none');
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error toggling like:', error);
+            } finally {
+                likeBtn.disabled = false;
+            }
+        }
+
+        // Fungsi untuk membuka modal foto
+        function openPhotoModal(photoId, imagePath, title, description, likesCount, isLiked) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90';
+            modal.innerHTML = `
+                <div class="relative max-w-5xl w-full">
+                    <button onclick="this.closest('.fixed').remove(); document.body.style.overflow = 'auto';" 
+                            class="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                    <img src="/storage/${imagePath}" 
+                         alt="${title}"
+                         class="w-full h-auto rounded-lg shadow-2xl">
+                    <div class="mt-4 text-white">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-semibold">${title}</h3>
+                                ${description ? `<p class="mt-2 text-gray-300">${description}</p>` : ''}
+                            </div>
+                            <button onclick="event.stopPropagation(); toggleLike(${photoId})" 
+                                    id="modal-like-btn-${photoId}"
+                                    class="flex items-center space-x-2 px-4 py-2 rounded-full backdrop-blur-md transition-all duration-300 ml-4 ${isLiked ? 'bg-red-500' : 'bg-black/40 hover:bg-black/60'}">
+                                <svg id="modal-like-icon-${photoId}" class="w-6 h-6" 
+                                     fill="${isLiked ? 'currentColor' : 'none'}" 
+                                     stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                </svg>
+                                <span id="modal-like-count-${photoId}" class="text-lg font-semibold">${likesCount}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            document.body.style.overflow = 'hidden';
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        }
+
+        function closeAlbumView() {
+            const modal = document.getElementById('albumViewModal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function closePhotoView() {
+            const modal = document.getElementById('photoViewModal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modals on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeAlbumView();
+                const photoModal = document.querySelector('.fixed.inset-0.z-50.flex');
+                if (photoModal) {
+                    photoModal.remove();
+                    document.body.style.overflow = 'auto';
+                }
+            }
+        });
+        // AI Assistant logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const aiToggle = document.getElementById('ai-assistant-toggle');
+            const aiPanel = document.getElementById('ai-assistant-panel');
+            const aiClose = document.getElementById('ai-assistant-close');
+            const aiInput = document.getElementById('ai-assistant-input');
+            const aiSend = document.getElementById('ai-assistant-send');
+            const aiMessages = document.getElementById('ai-assistant-messages');
+            const quickQuestions = document.querySelectorAll('.ai-quick-question');
+
+            const staticAnswer = `Hai! Aku RoboGaleri 🤖✨\n\nAku bisa bantu jawab pertanyaan seputar website ini seperti cara lihat album, info berita terbaru, atau bagaimana menambah agenda. Tinggal ketik aja pertanyaanmu ya!`;
+
+            const showPanel = () => {
+                if (!aiPanel) return;
+                aiPanel.classList.remove('hidden');
+                aiPanel.style.display = 'flex';
+            };
+
+            const hidePanel = () => {
+                if (!aiPanel) return;
+                aiPanel.classList.add('hidden');
+                aiPanel.style.display = 'none';
+            };
+
+            // Pastikan kondisi awal terset sesuai class default
+            hidePanel();
+
+            function appendMessage(content, type = 'assistant') {
+                const bubble = document.createElement('div');
+                bubble.className = type === 'assistant' ? 'assistant-bubble animate-slide-up' : 'user-bubble animate-slide-up';
+                bubble.textContent = content;
+                aiMessages.appendChild(bubble);
+                aiMessages.scrollTop = aiMessages.scrollHeight;
+            }
+
+            const cannedResponses = [
+                {
+                    keywords: ['apa itu schoolary', 'schoolary itu apa'],
+                    answer: 'Schoolary adalah website galeri sekolah yang memudahkan siswa, guru, dan orang tua untuk mengakses dokumentasi sekolah—mulai dari kegiatan, prestasi, hingga foto guru dan staf.'
+                },
+                {
+                    keywords: ['untuk apa schoolary', 'tujuan schoolary'],
+                    answer: 'Schoolary dibuat agar sekolah bisa menyimpan, mengelola, dan membagikan dokumentasi kegiatan, prestasi, serta informasi penting lainnya secara terstruktur dan mudah diakses.'
+                },
+                {
+                    keywords: ['bagaimana cara mendaftar', 'cara mendaftar', 'daftar', 'register'],
+                    answer: 'Cara mendaftar: (1) tekan tombol "Login" di pojok kanan atas, (2) pilih "Sign Up" bila belum punya akun, (3) selesai! Kamu bisa menggunakan fitur Like, Komen, dan Share.'
+                },
+                {
+                    keywords: ['fungsi utama schoolary', 'fungsi utama'],
+                    answer: 'Fungsi utama Schoolary adalah Galeri Sekolah digital sebagai tempat semua dokumentasi penting disimpan dan bisa dilihat kapan pun.'
+                },
+                {
+                    keywords: ['fitur schoolary', 'apa saja fitur'],
+                    answer: 'Fitur Schoolary meliputi Galeri (Like, Komen, Share), Berita & Agenda, Kontak, registrasi/login pengguna, dan AI Assistant.'
+                }
+            ];
+
+            const defaultResponse = 'Maaf, Cobo belum menemukan jawabannya. Coba gunakan kata kunci lain atau hubungi sekolah lewat halaman Kontak ya!';
+
+            const getAssistantAnswer = (message) => {
+                if (!message) return defaultResponse;
+                const lower = message.toLowerCase();
+                const matched = cannedResponses.find(item => item.keywords.some(keyword => lower.includes(keyword)));
+                return matched ? matched.answer : defaultResponse;
+            };
+
+            function simulateAssistantReply(userMessage) {
+                appendMessage(userMessage, 'user');
+                const typingBubble = document.createElement('div');
+                typingBubble.className = 'assistant-bubble';
+                typingBubble.innerHTML = `<div class="ai-typing"><span></span><span></span><span></span></div>`;
+                aiMessages.appendChild(typingBubble);
+                aiMessages.scrollTop = aiMessages.scrollHeight;
+
+                setTimeout(() => {
+                    typingBubble.remove();
+                    appendMessage(getAssistantAnswer(userMessage));
+                }, 700);
+            }
+
+            aiToggle?.addEventListener('click', () => {
+                if (!aiPanel) return;
+                if (aiPanel.classList.contains('hidden')) {
+                    showPanel();
+                } else {
+                    hidePanel();
+                }
+            });
+
+            aiClose?.addEventListener('click', (e) => {
+                e.preventDefault();
+                hidePanel();
+            });
+
+            aiSend?.addEventListener('click', () => {
+                const message = aiInput.value.trim();
+                if (!message) return;
+                aiInput.value = '';
+                simulateAssistantReply(message);
+            });
+
+            aiInput?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    aiSend.click();
+                }
+            });
+
+            quickQuestions.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    simulateAssistantReply(btn.dataset.question);
+                });
+            });
+        });
+    </script>
+
+    <!-- AI Assistant Widget -->
+    <div class="ai-assistant-wrapper">
+        <div id="ai-assistant-panel" class="ai-assistant-panel hidden">
+            <div class="ai-assistant-header">
+                <div class="info">
+                    <img src="assets/img/cobo.png" alt="Assistant Bot">
+                    <div>
+                        <p class="font-semibold text-sm">Cobo</p>
+                        <p class="text-xs opacity-90">Asisten interaktif & lucu</p>
+                    </div>
+                </div>
+                <button id="ai-assistant-close" class="text-white/80 hover:text-white text-xl">&times;</button>
+            </div>
+            <div class="ai-assistant-body">
+                <div id="ai-assistant-messages" class="ai-assistant-messages">
+                    <div class="assistant-bubble">
+                        Halo! Aku Cobo 🤖✨ Siap bantu kamu keliling website kece ini. Mau nanya apa nih?
+                    </div>
+                </div>
+                <div class="ai-quick-questions">
+                    <button class="ai-quick-question" data-question="Apa itu Schoolary?">Apa itu Schoolary?</button>
+                    <button class="ai-quick-question" data-question="Untuk apa Schoolary dibuat?">Untuk apa Schoolary dibuat?</button>
+                    <button class="ai-quick-question" data-question="Bagaimana cara mendaftar di Schoolary?">Bagaimana cara mendaftar?</button>
+                    <button class="ai-quick-question" data-question="Apa fungsi utama dari Schoolary?">Fungsi utama Schoolary?</button>
+                    <button class="ai-quick-question" data-question="Apa saja fitur yang ada di Schoolary?">Fitur Schoolary?</button>
+                </div>
+            </div>
+            <div class="ai-assistant-input">
+                <input id="ai-assistant-input" type="text" placeholder="Tanya apapun tentang website ini...">
+                <button id="ai-assistant-send">Kirim</button>
+            </div>
+        </div>
+
+        <div id="ai-assistant-toggle" class="ai-assistant-toggle">
+            <img src="assets/img/cobo.png" alt="Assistant Bot">
+            <span class="ai-assistant-badge">Hi!</span>
+        </div>
+    </div>
+</body>
+</html>
